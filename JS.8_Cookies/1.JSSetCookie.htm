@@ -1,124 +1,115 @@
-<html>
+<html lang="pt-PT">
 	<head>
-	<title>uso de Javascript para validação de formulario</title>
-	
-		<style type="text/css">
-<!--
-			#frmNome{color:				blue;
-					 text-decoration: 	none;
-		 			 text-transform:	lowercase;
-					 font-family: 		verdana;
-					 font-size: 		14
-					}
-					
-			#frmApelido{color:				blue;
-					 text-decoration: 	none;
-		 			 text-transform:	lowercase;
-					 font-family: 		verdana;
-					 font-size: 		14
-					}
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Exemplo de Cookies: trocar dados entre sessões</title>
+	<style type="text/css">
+		#frmNome{
+			color:				blue;
+			text-decoration: 	none;
+			text-transform:		lowercase;
+			font-family: 		Verdana;
+			font-size: 			14px;
+		}
 
-			#status{color:				black;
-					 text-decoration: 	none;
-		 			 text-transform:	lowercase;
-					 font-family: 		verdana;
-					 font-size: 		10
-					}
--->
-		</Style>
+		#frmApelido{color:		blue;
+			text-decoration: 	none;
+			text-transform:		lowercase;
+			font-family: 		Verdana;
+			font-size: 			14px;
+		}
 
-	
+		#status{color:				black;
+			text-decoration: 	none;
+			text-transform:	lowercase;
+			font-family: 		Verdana;
+			font-size: 		10px;
+		}
+	</style>
+
 	<script type="text/javascript">
-	function verPreenche(campo){
-// função para verificar se um dado campo de preenchimento obrigatorio está preenchido
-		with (campo){
-			if (value==null||value==""){
+		function verPreenche(campo){
+			if (campo.value==null||campo.value==""){
 //				alert("vazio");
 				return false;
 				}
-// verifica-se se o campo está vazio ou se tem uma string nula
 			else{
 //				alert("preenchido");
 				return true;
 				}
 		}
-	}
 
 		function validarForm(formulario){
 			var valido=true;
 			var txtStatus="";
-			with (formulario){
-				if (verPreenche(nome)==false){
-//o campo do nome não está preenchido, alerta-se o utilizador				
-					nome.focus();
-					document.getElementById('frmNome').style.color='red';
-					txtStatus=txtStatus + "Nome nao esta preenchido<br>";
-					valido=false;
-					}
-				else{
-//o campo do nome está preenchido, repoem-se o formato original
-					document.getElementById('frmNome').style.color='blue';
-					}
+			if (verPreenche(formulario.nome)==false){
+				formulario.nome.focus();
+				document.getElementById('frmNome').style.color='red';
+				txtStatus=txtStatus + "Nome nao esta preenchido<br>";
+				valido=false;
+				}
+			else{
+				document.getElementById('frmNome').style.color='blue';
+				}
 
-				if (verPreenche(apelido)==false){
-//o endereço de mail não está preenchido, alerta-se o utilizador				
-					txtStatus=txtStatus + "Apelido nao esta preenchido<br>";
-					document.getElementById('frmApelido').style.color='red';
-					valido=false;
-					}
-				else{
-//o endereço de mail está preenchido e é válido, repoem-se o formato original
-					document.getElementById('frmApelido').style.color='blue';
-					}
+		if (verPreenche(formulario.apelido)==false){		
+			txtStatus=txtStatus + "Apelido nao esta preenchido<br>";
+			document.getElementById('frmApelido').style.color='red';
+			valido=false;
+			}
+		else{
+			document.getElementById('frmApelido').style.color='blue';
 			}
 
-			if (valido==false){
-				document.getElementById('status').innerHTML="<strong>Verifique preenchimento do formulario</strong><br>"+txtStatus+"*Campos de Preenchimento obrigatorio";
-//a manipulação de conteudos via JavaScript permite a inclusão de tags de HTML
-			}
 			return valido;
 		}
 
-//	Manipulação de cookies
-//	O cookie é escrito na sessão contendo vários elementos:
-//		nome: serve de identificador e chave de identificação 
-//		valor:	o cookie propriamente dito
-//		validade: define o tempo máximo que o computador retem o cookie
-//		opções:	vários parametros de especificação do cookie
-//				podem ser desde definições de segurança ao local onde o browser deve armazenar o cookie
-//
-//	Cada cookie tem apenas um valor, mas uma página pode guardar inumeros cookies, tantos quantos os valores a reter 
+
+/************************************************************************************************
+ * 1. Função para escrever o cookie na sessão													*
+ * 	  Parametros e opções:																		*
+ * 	- cookie_name: nome do cookie, que serve de identificador e chave de identificação			*
+ * 	- cookie_value: o cookie propriamente dito, ou seja, o valor a ser guardado					*
+ * 	- encodeURIComponent: serve para encapsular caracteres especiais, permitindo que não 		*
+ * 	  provoquem erro																			*
+ * 	- Max-Age: define o tempo de validade do cookie em segundos									*
+ * 	  em alternativa ao uso de Max-Age, pode usar-se Expires:									*
+ *			const date = new Date();															*
+ *			date.setTime(date.getTime() + (validade*24*60*60*1000));							*
+ *			cookie += '; expires=' + date.toUTCString();										*
+ *	- Path indica a localização dos cookies														*
+ * 	  Se não for especificado caminho, a localização será a raiz do site - '/'					*
+ * 	  permitindo que o cookie seja acessível em todas as páginas								*
+ * 	- SameSite: Atributo de segurança que ajuda a proteger contra ataques CSRF (Cross-Site 		*
+ *    Request Forgery).													*						*
+ * 	  Default é 'Lax' (relaxado), que é suficientemente seguro para a maioria dos fluxos de 	*
+ * 	  formulários, continua a prevenir ataques CSRF, mas permite que os cookies sejam enviados 	*
+ * 	  com solicitações de navegação de nível superior iniciadas por outros sites.				*
+ * 	  'Lax' é um bom equilíbrio entre segurança e usabilidade.									*
+ * 	  Outros valores possíveis são 'Strict' e 'None':											*
+ * 	  'Strict' (estrito) oferece a maior segurança, mas não permite alguns fluxos de trabalho 	*
+ * 		legítimos, pois os cookies não serão enviados em resposta a solicitações iniciadas por 	*
+ * 		outros sites.																			*
+ * 	  'None' (nenhum) permite que os cookies sejam enviados em todas as solicitações, mas requer*
+ * 		que o atributo «Secure» também seja definido, o que significa que os cookies só serão 	*
+ * 		enviados em conexões HTTPS seguras.														*
+ *  - Secure: outro atributo de segurança que só permite transmissão do cookie em conexões 		*
+ * 		seguras (HTTPS).																		*
+ * 	  	É indispensável quando os cookies contêm informações sensíveis ou quando o atributo 	*
+ * 		SameSite é definido como 'None'.														*
+ *																								*
+ * 	- O cookie é escrito na sessão utilizando a sintaxe document.cookie = cookie;				*
+ ************************************************************************************************/
 	function setCookie(cookie_name,cookie_value,validade,opcoes = {}){
 		const enc = encodeURIComponent;
-//	encodeURIComponent serve para encapsular caracteres especiais, permitindo que não provoquem erro		
-  		let cookie = enc(cookie_name) + '=' + enc(cookie_value);
+		let cookie = enc(cookie_name) + '=' + enc(cookie_value);
 
 		if (typeof validade === 'number') {
 			cookie += '; Max-Age=' + validade * 24 * 60 * 60;
-//	em alternativa ao uso de Max-Age, pode usar-se Expires:		
-//			const date = new Date();
-//			date.setTime(date.getTime() + (validade*24*60*60*1000));
-//			cookie += '; expires=' + date.toUTCString();
   		}
-// 	Path indica a localização dos cookies
-// 	No formato abaixo, se não for especificado caminho, a localização será a raiz do site - '/'
-// 	permitindo que o cookie seja acessível em todas as páginas do site
   		cookie += '; Path=' + (opcoes.path || '/');
-
-// 	SameSite é um atributo de segurança que ajuda a proteger contra ataques CSRF (Cross-Site Request Forgery).
-// 	default é 'Lax' (relaxado), que é suficientemente seguro para a maioria dos fluxos de formulários,
-// 	continua a prevenir ataques CSRF, mas permite que os cookies sejam enviados com solicitações de navegação 
-// 	de nível superior iniciadas por outros sites.
-// 	'Lax' é um bom equilíbrio entre segurança e usabilidade.
-// 	Outros valores possíveis são 'Strict' e 'None':
-// 	'Strict' (estrito) oferece a maior segurança, mas nãopermite alguns fluxos de trabalho legítimos, pois os 
-// 	cookies não serão enviados em resposta a solicitações iniciadas por outros sites.
-// 	'None' (nenhum) permite que os cookies sejam enviados em todas as solicitações, mas requer que o atributo 
-// 	Secure também seja definido, o que significa que os cookies só serão enviados em conexões HTTPS seguras.
   		cookie += '; SameSite=' + (opcoes.sameSite || 'Lax');
 
-// 	Secure é outro atributo de segurança que só permite transmissão do cookie em conexões seguras (HTTPS).
-// 	É indispensável quando os cookies contêm informações sensíveis ou quando o atributo SameSite é definido como 'None'.
   		if (opcoes.secure) cookie += '; Secure';
 
 // 	Escrever o cookie na sessão
@@ -126,30 +117,42 @@
   		document.cookie = cookie;
 	}
 
-//	Função para obter o cookie da sessão
-//	só está neste ficheiro para permitir o log de consola na função checkCookie
-//	A função lê toda a informação referente a cada cookie e faz o parse (separação de valores) para retirar apenas o valor
+/************************************************************************************************
+ * 2. 	Função para ler o cookie da sessão														*
+ *	  	só está neste ficheiro para permitir o log de consola na função checkCookie				*
+ *		A função lê toda a informação referente a cada cookie e faz o parse (separação de 		*
+ *    	valores) para retirar apenas o valor guardado											*
+ ************************************************************************************************/
 	function getCookie(name) {
+		console.log('GET -> name=', name);
 		const enc = encodeURIComponent;
+		console.log('GET -> document.cookie=', document.cookie);
 		const prefix = enc(name) + "=";
-		return document.cookie
-			.split(';')
-//	divide o cookie nos seus diversos componentes (v. acima)			
-			.map(c => c.trim())
-//	retira os espaços de cada um dos valores 			
+		return document.cookie		// lê os cookies do documento
+									// e devolve uma string unica com toda a informação de todos os cookies
+									// separados por ';'
+									// o formato de cada cookie é: 'cookie_name=cookie_value; Max-Age=validade; Path=path; SameSite=sameSite; Secure'
+			.split(';')				//	divide o cookie nos seus diversos componentes (v. acima)			
+			.map(c => c.trim())		//	retira os espaços de cada um dos valores 
 			.filter(c => c.startsWith(prefix))
-//	filtra o resultado do split para ficar apenas com o para que contém o nome pretendido			
+									//	filtra o resultado do split para ficar apenas com o parametro que contém o nome pretendido (prefix)		
 			.map(c => decodeURIComponent(c.substring(prefix.length)))[0] || null;
-// retira o prefixo (nome do cookie) e devolve apenas o valor			
+									// retira o prefixo (nome do cookie) e devolve apenas o valor
 	}
 
 //	Função para escrever o cookie a partir do formulário
 	function checkCookie(formulario){
+		console.log('checkCookie -> formulario.nome.value=', formulario.nome.value, 'formulario.apelido.value=', formulario.apelido.value);
 		if (validarForm(formulario)){
 		    setCookie('nome',formulario.nome.value,1);
 			setCookie('apelido',formulario.apelido.value,1);
-    		console.log('nome=', getCookie('nome'), 'apelido=', getCookie('apelido'));
-			return true
+			if (getCookie('nome')==null || getCookie('apelido')==null){
+				document.getElementById('status').innerHTML="Erro ao gravar o cookie";
+				return false;
+			} else{
+    			console.log('nome=', getCookie('nome'), 'apelido=', getCookie('apelido'));
+				return true;
+			}
 		}
 		else{
 			return false;
@@ -163,23 +166,23 @@
 	Caso o resultado da chamada à função seja TRUE, é chamada a página 2.JSReadCookie.htm, que irá ler os cookies
 	
 	Como se está a utilizar ficheiros estáticos - HTML ou JS - o método do formulário terá que ser GET
-	Caso a chamada seja para ficheiros server side, o método já poerá ser POST
+	Caso a chamada seja para ficheiros server side, o método já poderá ser POST
 -->
 	<form action="2.JSReadCookie.htm" onsubmit="return checkCookie(this);" method="get">
 <!-- 'this' refere-se ao objecto identificado na TAG, i.e., ao FORM -->
 		<table align="center">
 			<tr id="frmNome">
-				<td align="right" width="75">Nome: </td>
-				<td align="left"><input type="text" name="nome" size="30"></td>
+				<td align="right" width="75"><label for="nome">Nome: </label></td>
+				<td align="left"><input type="text" id="nome" name="nome" size="30"></td>
 				<td align="left" width="25">*</td>
 			</tr>
 			<tr id="frmApelido" >
-				<td align="right">Apelido: </td>
-				<td align="left"><input type="text" name="apelido" size="30"></td>
+				<td align="right"><label for="apelido">Apelido: </label></td>
+				<td align="left"><input type="text" id="apelido" name="apelido" size="30"></td>
 				<td align="left" width="25">*</td>
 			</tr>
 			<tr>
-				<td id="status" colspan="3">* preenchimeto obrigatorio</td>
+				<td id="status" colspan="3">* preenchimento obrigatório</td>
 			</tr>
 			<tr>
 				<td colspan="3" align="center"><input type="submit" value="Gravar Cookie"></td>

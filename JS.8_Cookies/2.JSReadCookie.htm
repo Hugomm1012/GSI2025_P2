@@ -1,5 +1,7 @@
-<html>
+<html lang="pt-PT">
 	<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>uso de Javascript para validação de formulario</title>
 	
 		<style type="text/css">
@@ -31,51 +33,42 @@
 	<script type="text/javascript">
 	function verPreenche(campo){
 //função para verificar se um dado campo de preenchimento obrigatorio está preenchido
-		with (campo){
-			if (value==null||value==""){
-//				alert("vazio");
-				return false;
-				}
+		if (campo.value==null||campo.value==""){
+//			alert("vazio");
+			return false;
+			}
 //verifica-se se o campo está vazio ou se tem uma string nula
-			else{
-//				alert("preenchido");
-				return true;
-				}
-		}
+		else{
+//			alert("preenchido");
+			return true;
+			}
 	}
 
 		function validarForm(formulario){
 			var valido=true;
 			var txtStatus="";
-			with (formulario){
-				if (verPreenche(nome)==false){
+		if (verPreenche(formulario.nome)==false){
 //o campo do nome não está preenchido, alerta-se o utilizador				
-					nome.focus();
-					document.getElementById('frmNome').style.color='red';
-					txtStatus=txtStatus + "Nome nao esta preenchido<br>";
-					valido=false;
-					}
-				else{
+			formulario.nome.focus();
+			document.getElementById('frmNome').style.color='red';
+			txtStatus=txtStatus + "Nome nao esta preenchido<br>";
+			valido=false;
+			} else {
 //o campo do nome está preenchido, repoem-se o formato original
-					document.getElementById('frmNome').style.color='blue';
-					}
+			document.getElementById('frmNome').style.color='blue';
+			}
 
-				if (verPreenche(apelido)==false){
+		if (verPreenche(formulario.apelido)==false){
 //o endereço de mail não está preenchido, alerta-se o utilizador				
-					txtStatus=txtStatus + "Apelido nao esta preenchido<br>";
-					document.getElementById('frmApelido').style.color='red';
-					valido=false;
-					}
-				else{
+			txtStatus=txtStatus + "Apelido nao esta preenchido<br>";
+			document.getElementById('frmApelido').style.color='red';
+			valido=false;
+			} else {
 //o endereço de mail está preenchido e é valido, repoem-se o formato original
-					document.getElementById('frmApelido').style.color='blue';
-					}
+			document.getElementById('frmApelido').style.color='blue';
 			}
-
-			if (valido==false){
-				document.getElementById('status').innerHTML="<strong>Verifique preenchimento do formulario</strong><br>"+txtStatus+"*Campos de Preenchimento obrigatorio";
 //a manipulação de conteudos via JavaScript permite a inclusão de tags de HTML
-			}
+			document.getElementById('status').innerHTML=txtStatus;
 			return valido;
 		}
 
@@ -130,13 +123,13 @@
 			<tr id="frmNome">
 				<td align="right" width="75">Nome: </td>
 <!-- 'this' refere-se ao objecto identificado na TAG, i.e., ao FORM -->
-				<td align="left"><input type="text" name="nome" id="nome" size="30"></td>
+				<td align="left"><input type="text" name="nome" id="nome" size="30" title="Introduza o seu nome" placeholder="Nome"></td>
 				<td align="left" width="25">*</td>
 			</tr>
 			<tr id="frmApelido" >
 				<td align="right">Apelido: </td>
 <!-- 'this' refere-se ao objecto identificado na TAG, i.e., ao FORM -->
-				<td align="left"><input type="text" name="apelido" id="apelido" size="30"></td>
+				<td align="left"><input type="text" name="apelido" id="apelido" size="30" title="Introduza o seu apelido" placeholder="Apelido"></td>
 				<td align="left" width="25">*</td>
 			</tr>
 			<tr>

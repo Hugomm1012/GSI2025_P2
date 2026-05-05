@@ -1,7 +1,29 @@
+<!------------------------------------------------------------------------------------------------
+ !  Exemplo idêntico a JS.7_LocalData/biblioteca_v2,htm, mas utilizando cookies para armazenar  --
+ !  os dados em vez de localStorage/sessionStorage                                              --
+ !                                                                                              --   
+ !  Como os cookies só permite armazenar strings, é necessário converter o array de objetos em  --
+ !  string JSON - JSON.stringify() - para o armazenar. Inversamente, ao ler o cookie, é neces-  --
+ !  sá rio reverter a string JSON de volta para um array de objetos - JSON.parse() - para os    --
+ !  poder apresentar em ecrã.                                                                   --
+ !                                                                                              --
+ !  Para aplicar este exemplo é necessário ter em atenção que:                                  --
+ !  - os cookies têm limitações de tamanho (por defeito, 4KB por cookie);                       --
+ !  - o número total de cookies por domínio é limitado (geralmente 20-50).                      --
+ !  - os cookies são enviados ao servidor em cada requisição HTTP, o que inflencia o desempenho --
+ !  Portanto, esta abordagem não é a mais adequada para persitência volumes relevantes de dados --
+ !  O exemplo é apresentado apenas para demonstrar o uso de cookies com dados estruturados, em  --
+ !  de texto simples. Esta abordagem pode ser util para comunicação entre páginas ou para per-  --
+ !  sistência de objectos compostos (e.g. dicionários)                                          --
+ !  Em contextos mais complexos ou onde seja requerida maior segurança, devem considerar-se al- --
+ !  ternativas, que podem ser localStorage ou sessionStorage, para dados que possam ser mantidos--
+ !  apenas no cliente, ou mesmo soluções server-side.                                           --
+ !------------------------------------------------------------------------------------------------>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Next Generation Technology School</title>
     <style>
         body {
